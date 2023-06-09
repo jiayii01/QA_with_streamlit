@@ -15,7 +15,7 @@ def extract_text_from_pdfs(pdfs):
     # Iterate over the PDF files
     for pdf in pdfs:
         # Open the PDF file
-        with BytesIO(pdf_file.read()) as f:
+        with BytesIO(pdf.read()) as f:
 
             pdf_reader = PyPDF2.PdfReader(f)
             num_pgs = len(pdf_reader.pages)
