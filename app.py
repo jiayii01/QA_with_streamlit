@@ -54,9 +54,9 @@ def get_relevant_texts(df, topic):
     cosine_threshold = 0.3  # set threshold for cosine similarity value
     queries = topic  # search query
     results = []
+    query_embedding = model_embedding.encode(queries)
     for i, document in enumerate(df["sentences"]):
         sentence_embeddings = model_embedding.encode(document)
-        query_embedding = model_embedding.encode(queries)
         for j, sentence_embedding in enumerate(sentence_embeddings):
             distance = cosine_similarity(
                 sentence_embedding.reshape((1, -1)), query_embedding.reshape((1, -1))
