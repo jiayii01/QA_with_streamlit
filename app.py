@@ -7,37 +7,30 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from transformers import AutoTokenizer, BertForQuestionAnswering, pipeline
 
-st.title("Question-Answering Webapp")
+st.title("Question-Answering System using BERT (trained on squad2)")
 
 @st.cache_data()
-def extract_text_from_pdfs(pdf_files):
-    # Create an empty data frame
+def extract_text_from_pdfs(pdfs):
     df = pd.DataFrame(columns=["file", "text"])
     # Iterate over the PDF files
-    for pdf_file in pdf_files:
+    for pdf in pdfs:
         # Open the PDF file
-        # with open(pdf_file.read(), "rb") as f:
         with BytesIO(pdf_file.read()) as f:
-            # Create a PDF reader object
+
             pdf_reader = PyPDF2.PdfReader(f)
-            # Get the number of pages in the PDF
-            num_pages = len(pdf_reader.pages)
-            # Initialize a string to store the text from the PDF
+            num_pgs = len(pdf_reader.pages)
             text = ""
             # Iterate over all the pages
-            for page_num in range(num_pages):
+            for page_num in range(num_pgs):
                 # Get the page object
                 page = pdf_reader.pages[page_num]
                 # Extract the text from the page
                 page_text = page.extract_text()
                 # Add the page text to the overall text
                 text += page_text
-            # Add the file name and the text to the data frame
-            # df = df.append({"file": pdf_file.name, "text": text}, ignore_index=True)
-            df = pd.concat([df, pd.DataFrame({"file": pdf_file.name, "text": text}, index=[0])])
-    # Return the data frame
-    return df
+            df = pd.concat([df, pd.DataFrame({"file": pdf.name, "text": text}, index=[0])])
 
+    return df
 
 def preprocess_text(text_list):
     # Initialize a empty list to store the pre-processed text
@@ -50,11 +43,9 @@ def preprocess_text(text_list):
     # Return the pre-processed text
     return processed_text
 
-
-def remove_short_sentences(df):
-    df["sentences"] = df["sentences"].apply(preprocess_text)
-    return df
-
+# def remove_short_sentences(df):
+#     df["sentences"] = df["sentences"].apply(preprocess_text)
+#     return df
 
 @st.cache_resource()
 def get_relevant_texts(df, topic):
@@ -104,7 +95,7 @@ def create_context(df):
     df["sentences"] = df["text"].apply(
         lambda long_str: long_str.replace("\n", " ").split(".")
     )
-    df = remove_short_sentences(df)
+    df["sentences"] = df["sentences"].apply(preprocess_text)
 
     context = get_relevant_texts(df, topic)
     return context
