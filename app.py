@@ -79,11 +79,11 @@ def get_relevant_texts(df, topic):
 def get_pipeline():
     modelname = "deepset/bert-base-cased-squad2"
     # modelname = "deepset/electra-base-squad2"
-    model_qa = BertForQuestionAnswering.from_pretrained(modelname)
-    # model_qa.save_pretrained(modelname)
+    qa_model = BertForQuestionAnswering.from_pretrained(modelname)
+
     tokenizer = AutoTokenizer.from_pretrained(modelname)
-    # tokenizer.save_pretrained("tokenizer-" + modelname)
-    qa = pipeline("question-answering", model=model_qa, tokenizer=tokenizer)
+
+    qa = pipeline("question-answering", model=qa_model, tokenizer=tokenizer)
     return qa
 
 def answer_question(pipeline, question: str, context: str) -> Dict:
@@ -108,18 +108,17 @@ def start_app():
 
 
 pdf_files = st.file_uploader(
-    "Upload pdf files", type=["pdf"], accept_multiple_files=True
+    "Upload PDF files", type=["pdf"], accept_multiple_files=True
 )
 
 if pdf_files:
-    with st.spinner("processing pdf..."):
+    with st.spinner("Processing PDF..."):
         df = extract_text_from_pdfs(pdf_files)
 
-    topic = st.text_input("What topic are you searching for?")
-    question = st.text_input("What is your question?")
+    topic = st.text_input("🔎 What topic are you searching for?")
+    question = st.text_input("💭 What is your question?")
 
     if question != "":
-        # pipeline = get_pipeline()
         with st.spinner("Searching. Please hold..."):
             context = create_context(df)
             qa_pipeline = start_app()
