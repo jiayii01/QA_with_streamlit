@@ -5,9 +5,9 @@ import PyPDF2
 from typing import Dict
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-from transformers import AutoTokenizer, BertForQuestionAnswering, pipeline
+from transformers import AutoTokenizer, BertForQuestionAnswering, pipeline, AutoModelForQuestionAnswering
 
-st.title("Question-Answering System using BERT (trained on squad2)")
+st.title("Question-Answering System using ROBERTA (trained on squad2)")
 
 @st.cache_data()
 def extract_text_from_pdfs(pdfs):
@@ -77,11 +77,12 @@ def get_relevant_texts(df, topic):
 
 @st.cache_resource()
 def get_pipeline():
-    modelname = "deepset/bert-base-cased-squad2"
-    # modelname = "deepset/electra-base-squad2"
-    qa_model = BertForQuestionAnswering.from_pretrained(modelname)
-
-    tokenizer = AutoTokenizer.from_pretrained(modelname)
+    model_name = "deepset/roberta-base-squad2"
+    # model_name = "deepset/bert-base-cased-squad2"
+    # model_name = "deepset/electra-base-squad2"
+    qa_model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+    # qa_model = BertForQuestionAnswering.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     qa = pipeline("question-answering", model=qa_model, tokenizer=tokenizer)
     return qa
